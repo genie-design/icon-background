@@ -1,10 +1,11 @@
 <script>
+	import '../app.pcss';
 	import Header from './Header.svelte';
 	import './styles.css';
 </script>
 
-<div class="app">
-	<Header />
+<div class="app" data-theme="bdb">
+	<Header></Header>
 
 	<main>
 		<slot />

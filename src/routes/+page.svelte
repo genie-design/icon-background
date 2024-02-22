@@ -18,7 +18,7 @@
 			</picture>
 		</span>
 
-		to your new<br />SvelteKit app
+		to your new<br /><span class="font-sheila_crayon">SvelteKit</span> app
 	</h1>
 
 	<h2>
