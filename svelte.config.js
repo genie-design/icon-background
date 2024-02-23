@@ -13,7 +13,12 @@ const config = {
 				include: ['/*'],
 				exclude: ['<all>']
 			}
-		})
+		}),
+		alias: {
+			'$components': './src/components',
+			'$utils': './src/utils',
+			'$routes': './src/routes',
+		}
 	}
 };
 
