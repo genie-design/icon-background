@@ -124,7 +124,6 @@
 			const max = Math.min(maxMax, currMax);
 			return Math.max(min, Math.floor(Math.random() * ((max - min) / 8) + min / 8) * 8);
 		};
-		const pad = padding ?? 16;
 		let y = yStart || 0;
 		const system = new System();
 		if (blank) {
@@ -185,8 +184,7 @@
 				let widthOffset = 0;
 				while (collides && widthOffset <= 256 && width > 0) {
 					const paddingX = prevWidthAndHeight * (Math.random() * 0.75 + randomOffset);
-					const maxWOffset = Math.max(0.75, (12 - maxWidthSetting) * 0.25);
-					const paddingY = prevWidthAndHeight * (Math.random() * maxWOffset + randomOffset);
+					const paddingY = prevWidthAndHeight * (Math.random() * 0.75 + randomOffset);
 					width = getWidth(xMax - x - paddingX - widthOffset);
 					top = y + paddingY;
 					left = x + paddingX;
@@ -247,7 +245,7 @@
 					x = x + width;
 				}
 			}
-			y += 128 + pad;
+			y += maxWidthSetting * 16;
 		}
 
 		return addedIcons;
