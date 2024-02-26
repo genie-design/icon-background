@@ -43,6 +43,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"detect-collisions": "^9.2.4",
 		"jszip": "^3.10.1",
 		"superjson": "^2.2.1"
 	}

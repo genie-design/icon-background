@@ -1,5 +1,6 @@
 <script context="module" lang="ts">
 	import JSZip from 'jszip';
+	import { Box, System } from 'detect-collisions';
 
 	export type BackgroundProps = {
 		xMax?: number;
@@ -17,6 +18,7 @@
 			width: number;
 			height: number;
 			circle?: boolean;
+			ellipse?: boolean;
 			padding?: number;
 		};
 		flippableIcons?: string[];
@@ -78,7 +80,9 @@
 		padding?: number;
 	}) => {
 		options = options || {};
-		const { xStart, yStart, xMax, yMax, padding } = options;
+		const { xStart, yStart, padding } = options;
+		let xMax = options.xMax || 0;
+		let yMax = options.yMax || 0;
 		const icons: Icon[] = [
 			'paw-prints',
 			'heart-doodle',
@@ -114,42 +118,120 @@
 		const flipIcons = ['paw-prints', 'heart-fill'];
 
 		const rotateIcons = ['paw-print', 'paw-fill', 'paw-two-tone'];
-		const getWidth = () => {
-			const min = 32;
-			const max = (maxWidth || 9) * 16;
-			return Math.floor(Math.random() * ((max - min) / 8) + min / 8) * 8;
+		const min = 32;
+		const maxMax = (maxWidth || 9) * 16;
+		const getWidth = (currMax: number) => {
+			const max = Math.min(maxMax, currMax);
+			return Math.max(min, Math.floor(Math.random() * ((max - min) / 8) + min / 8) * 8);
 		};
 		const pad = padding ?? 16;
 		let y = yStart || 0;
-		while (y < (yMax || 0)) {
-			let x = xStart || 0;
-			while (x < (xMax || 0)) {
-				const width = getWidth();
-				const spreadX = (maxWidth || 9) * 7;
-				const spreadY = (maxWidth || 9) * (17 - (maxWidth || 9));
-				const top = Math.floor(Math.random() * spreadY) + y + Math.floor(Math.random() * pad);
-				const left = Math.floor(Math.random() * spreadX) + x + Math.floor(Math.random() * pad);
-
-				const leastColor = Math.min(...Object.values(colorsCount));
-				const colorsWithLeast = Object.keys(colorsCount).filter(
-					(color) => colorsCount[color] === leastColor
+		const system = new System();
+		if (blank) {
+			if (blank.circle) {
+				system.createCircle(
+					{
+						x: blank.left + blank.width / 2,
+						y: blank.top + blank.height / 2
+					},
+					blank.width / 2,
+					{
+						padding: blank.padding
+					}
 				);
-				const color = colorsWithLeast[Math.floor(Math.random() * colorsWithLeast.length)];
-				colorsCount[color]++;
-				const leastIcon = Math.min(...Object.values(iconsCount));
-				const iconsWithLeast = icons.filter((icon) => iconsCount[icon] === leastIcon);
-				const icon = iconsWithLeast[Math.floor(Math.random() * iconsWithLeast.length)];
-				let flipped = false;
-				if (flipIcons.includes(icon) && Math.random() > 0.5) {
-					flipped = true;
+			} else if (blank.ellipse) {
+				const radiusX = blank.width / 2;
+				const radiusY = blank.height / 2;
+
+				system.createEllipse(
+					{
+						x: blank.left + blank.width / 2,
+						y: blank.top + blank.height / 2
+					},
+					radiusX,
+					radiusY,
+					(radiusX + radiusY) / Math.PI,
+					{
+						padding: blank.padding
+					}
+				);
+			} else {
+				system.createBox(
+					{
+						x: blank.left,
+						y: blank.top
+					},
+					blank.width,
+					blank.height,
+					{
+						padding: blank.padding
+					}
+				);
+			}
+		}
+		while (y < yMax) {
+			let x = xStart || 0;
+			while (x < xMax) {
+				const previousIcon = addedIcons.length > 0 ? addedIcons[addedIcons.length - 1] : null;
+				const prevWidthAndHeight = previousIcon ? previousIcon.widthAndHeight * 16 : 32;
+
+				let width = min;
+				let left = 0;
+				let top = 0;
+				let collides = true;
+
+				let box: Box | undefined = undefined;
+				let randomOffset = 0.25;
+				let widthOffset = 0;
+				while (collides && widthOffset <= 256 && width > 0) {
+					const paddingX = prevWidthAndHeight * (Math.random() * 0.75 + randomOffset);
+					const paddingY = prevWidthAndHeight * (Math.random() * 0.75 + randomOffset);
+					width = getWidth(xMax - x - paddingX - widthOffset);
+					top = y + paddingY;
+					left = x + paddingX;
+					box = new Box(
+						{
+							x: left,
+							y: top
+						},
+						width,
+						width,
+						{
+							padding: 32
+						}
+					);
+					system.insert(box);
+					collides = system.checkOne(box, () => true);
+					if (widthOffset >= 128) {
+						randomOffset += 0.25;
+					}
+					widthOffset += 16;
+					if (collides) {
+						system.remove(box);
+					}
 				}
-				let rotateClass = '';
-				if (rotateIcons.includes(icon) && Math.random() > 0.2) {
-					rotateClass += rotateClasses[Math.floor(Math.random() * rotateClasses.length)];
-				}
-				iconsCount[icon]++;
-				if (left + width < (xMax || 0)) {
-					addedIcons.push({
+
+				if (box && !collides) {
+					const leastColor = Math.min(...Object.values(colorsCount)) + 1;
+					const colorsWithLeast = Object.keys(colorsCount).filter(
+						(color) => colorsCount[color] <= leastColor
+					);
+					const color = colorsWithLeast[Math.floor(Math.random() * colorsWithLeast.length)];
+					colorsCount[color]++;
+					const leastIcon = Math.min(...Object.values(iconsCount)) + 1;
+					const iconsWithLeast = icons.filter((icon) => iconsCount[icon] <= leastIcon);
+					const icon = iconsWithLeast[Math.floor(Math.random() * iconsWithLeast.length)];
+					let flipped = false;
+					if (flipIcons.includes(icon) && Math.random() > 0.5) {
+						flipped = true;
+					}
+					let rotateClass = '';
+					if (rotateIcons.includes(icon) && Math.random() > 0.2) {
+						rotateClass += rotateClasses[Math.floor(Math.random() * rotateClasses.length)];
+					}
+					iconsCount[icon]++;
+					// system.insert(box);
+					const iconToAdd = {
 						left,
 						top,
 						widthAndHeight: width / 16,
@@ -157,9 +239,12 @@
 						icon,
 						flipped,
 						rotateClass
-					});
+					};
+					addedIcons.push(iconToAdd);
+					x = left + width;
+				} else {
+					x = x + width;
 				}
-				x = left + width;
 			}
 			y += 128 + pad;
 		}
@@ -192,27 +277,6 @@
 			background = iconConfigs.reduce<BGIcon[]>((acc, pos) => {
 				let classes = '';
 				const icon = pos.icon;
-
-				const padding = rect.padding ?? 0;
-				const width = pos.widthAndHeight * 16;
-				const circleX = rect.left + rect.width / 2;
-				const circleY = rect.top + rect.height / 2;
-				const radius = (rect.width + padding) / 2;
-
-				if (blank) {
-					const intersects = squareIntersectsCircle(
-						circleX,
-						circleY,
-						radius,
-						pos.left,
-						pos.top,
-						width
-					);
-					if (intersects) {
-						return acc;
-					}
-				}
-
 				if (pos.flipped) {
 					classes += ' scale-x-[-1]';
 				}
@@ -230,13 +294,10 @@
 					classes
 				};
 				if (pos.top === 8) {
-					console.log('bam', bgIcon);
 				}
 				acc.push(bgIcon);
 				return acc;
 			}, []);
-
-			console.log('set state');
 		} catch (e) {
 			console.error(e);
 		}
@@ -254,15 +315,13 @@
 				compression: 'DEFLATE',
 				compressionOptions: { level: 9 }
 			});
-			const original = await (await zip.loadAsync(zipped, { base64: true }))
-				.file('minified_configs.json')
-				?.async('string');
-			console.log(zipped);
+			// const original = await (await zip.loadAsync(zipped, { base64: true }))
+			// 	.file('minified_configs.json')
+			// 	?.async('string');
 			const urlEncoded = encodeURIComponent(zipped);
-			console.log('0-0');
+			// console.log(zipped);
+			// console.log('0-0');
 			console.log(urlEncoded);
-			console.log('0-0');
-			console.log(original === configString);
 		}
 	};
 	$: zipConfigs();
