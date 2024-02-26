@@ -188,26 +188,28 @@
 					width = getWidth(xMax - x - paddingX - widthOffset);
 					top = y + paddingY;
 					left = x + paddingX;
-					box = new Box(
-						{
-							x: left,
-							y: top
-						},
-						width,
-						width,
-						{
-							padding: 32
+					if (left + width < xMax) {
+						box = new Box(
+							{
+								x: left,
+								y: top
+							},
+							width,
+							width,
+							{
+								padding: 32
+							}
+						);
+						system.insert(box);
+						collides = system.checkOne(box, () => true);
+						if (collides) {
+							system.remove(box);
 						}
-					);
-					system.insert(box);
-					collides = system.checkOne(box, () => true);
+					}
 					if (widthOffset >= 128) {
 						randomOffset += 0.25;
 					}
 					widthOffset += 16;
-					if (collides) {
-						system.remove(box);
-					}
 				}
 
 				if (box && !collides) {
