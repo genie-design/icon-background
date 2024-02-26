@@ -2,7 +2,7 @@
 	import '../app.pcss';
 </script>
 
-<div class="app bg-transparent" data-theme="bdb">
+<div class="app" data-theme="bdb">
 	<main>
 		<slot />
 	</main>
