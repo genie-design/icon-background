@@ -65,10 +65,10 @@
 
 <script lang="ts">
 	import BackgroundIcon from './BackgroundIcon.svelte';
-	import { squareIntersectsCircle } from '../utils';
 	export let xMax: BackgroundProps['xMax'] = 0;
 	export let yMax: BackgroundProps['yMax'] = 0;
 	export let maxWidth: BackgroundProps['maxWidth'] = 9;
+	const maxWidthSetting = maxWidth && maxWidth < 10 ? maxWidth : 9;
 	export let padding: BackgroundProps['padding'] = undefined;
 	export let blank: BackgroundProps['blank'] = undefined;
 	export let unzippedIconConfigs: AddedIcon[] | undefined = undefined;
@@ -119,7 +119,7 @@
 
 		const rotateIcons = ['paw-print', 'paw-fill', 'paw-two-tone'];
 		const min = 32;
-		const maxMax = (maxWidth || 9) * 16;
+		const maxMax = maxWidthSetting * 16;
 		const getWidth = (currMax: number) => {
 			const max = Math.min(maxMax, currMax);
 			return Math.max(min, Math.floor(Math.random() * ((max - min) / 8) + min / 8) * 8);
@@ -185,7 +185,8 @@
 				let widthOffset = 0;
 				while (collides && widthOffset <= 256 && width > 0) {
 					const paddingX = prevWidthAndHeight * (Math.random() * 0.75 + randomOffset);
-					const paddingY = prevWidthAndHeight * (Math.random() * 0.75 + randomOffset);
+					const maxWOffset = Math.max(0.75, (12 - maxWidthSetting) * 0.25);
+					const paddingY = prevWidthAndHeight * (Math.random() * maxWOffset + randomOffset);
 					width = getWidth(xMax - x - paddingX - widthOffset);
 					top = y + paddingY;
 					left = x + paddingX;
