@@ -1,38 +1,13 @@
-# create-svelte
+# Create a configurable icon background
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+Here are examples with various widths, heights and black areas.
 
-## Creating a project
+https://icon-background.pages.dev/?options={%22json%22:{%22xMax%22:1670,%22yMax%22:1852,%22maxWidth%22:9,%22blank%22:{%22ellipse%22:true,%22padding%22:0,%22top%22:48,%22left%22:515,%22width%22:640,%22height%22:549}}}
+https://icon-background.pages.dev/?options={%22json%22:{%22xMax%22:384,%22yMax%22:1708,%22maxWidth%22:4,%22blank%22:{%22circle%22:true,%22padding%22:0,%22top%22:132,%22left%22:48,%22width%22:288,%22height%22:247}}}
+https://icon-background.pages.dev/?options={%22json%22:{%22xMax%22:640,%22yMax%22:1600,%22maxWidth%22:3,%22blank%22:{%22ellipse%22:true,%22padding%22:0,%22top%22:56,%22left%22:200,%22width%22:240,%22height%22:206}}}
+https://icon-background.pages.dev/?options={%22json%22:{%22xMax%22:384,%22yMax%22:1708,%22maxWidth%22:4}}
+https://icon-background.pages.dev/?options={%22json%22:{%22xMax%22:640,%22yMax%22:1600,%22maxWidth%22:3,%22blank%22:{%22ellipse%22:false,%22padding%22:50,%22top%22:56,%22left%22:200,%22width%22:240,%22height%22:206}}}
 
-If you're seeing this, you've probably already done this step. Congrats!
+🏗️ Icon, color, transformation options under construction
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+Use https://github.com/genie-design/icon-bg-wrangler to take screenshots and use on your site
